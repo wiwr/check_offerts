@@ -71,7 +71,7 @@ def extractDetailsForXKom(soup):
 
 
 def checkPrice(url, storeName):
-    if storeName == "amazon.de":
+    if storeName == "amazon.de" or storeName == "amazon.co.uk":
         cookies = {'i18n-prefs':'PLN'} 
     else: cookies = {} 
     soup = pageRequest(url, cookies)
@@ -90,7 +90,7 @@ def checkPrice(url, storeName):
     printDetails(storeName, price, currency, title)
 
 
-def checkAmazone(prodID):
+def checkAmazon(prodID):
     checkPrice(f'https://www.amazon.de/-/pl/dp/{prodID}', 'amazon.de')
     checkPrice(f'https://www.amazon.pl/dp/{prodID}','amazon.pl')
     checkPrice(f'https://www.amazon.co.uk/dp/{prodID}','amazon.co.uk')
@@ -107,41 +107,57 @@ def checkOleOle(prodID):
 
 
 if __name__ == "__main__":
-    try:
-        file_name = "AmazonProdID.txt"
-        with open(file_name,"r") as file:
-            lines = file.readlines()
-            for line in lines:
-                checkAmazone(line.strip())
-    except IOError as e:
-        print(f'File name: {file_name}')
-        if e.errno == errno.ENOENT:
-            print("File not found!")
-        else:
-            print("An error occurred:", e)
+    with open("list.json", 'r') as file:
+        data = json.load(file)
+        print("-"*80)
+        for item in data['items']:
+            print("Name:", item['name'])
+            print("Description:", item['description'])
 
-    try:
-        file_name = "OleOleProdID.txt"
-        with open(file_name,"r") as file:
-            lines = file.readlines()
-            for line in lines:
-                checkOleOle(line.strip())
-    except IOError as e:
-        print(f'File name: {file_name}')
-        if e.errno == errno.ENOENT:
-            print("File not found!")
-        else:
-            print("An error occurred:", e)
+            for store in item['stores']:
+                if store['store_name'] == 'Amazon':
+                    checkAmazon(store['prod_id'].strip())
+                elif store['store_name'] == 'OleOle':
+                    checkOleOle(store['prod_id'].strip())
+                elif store['store_name'] == 'x-kom':
+                    checkXKom(store['prod_id'].strip())
 
-    try:
-        file_name = "XKomProdID.txt"
-        with open(file_name,"r") as file:
-            lines = file.readlines()
-            for line in lines:
-                checkXKom(line.strip())
-    except IOError as e:
-        print(f'File name: {file_name}')
-        if e.errno == errno.ENOENT:
-            print("File not found!")
-        else:
-            print("An error occurred:", e)
+            print("-"*80)
+    #try:
+        #file_name = "AmazonProdID.txt"
+        #with open(file_name,"r") as file:
+            #lines = file.readlines()
+            #for line in lines:
+                #checkAmazone(line.strip())
+    #except IOError as e:
+        #print(f'File name: {file_name}')
+        #if e.errno == errno.ENOENT:
+            #print("File not found!")
+        #else:
+            #print("An error occurred:", e)
+#
+    #try:
+        #file_name = "OleOleProdID.txt"
+        #with open(file_name,"r") as file:
+            #lines = file.readlines()
+            #for line in lines:
+                #checkOleOle(line.strip())
+    #except IOError as e:
+        #print(f'File name: {file_name}')
+        #if e.errno == errno.ENOENT:
+            #print("File not found!")
+        #else:
+            #print("An error occurred:", e)
+#
+    #try:
+        #file_name = "XKomProdID.txt"
+        #with open(file_name,"r") as file:
+            #lines = file.readlines()
+            #for line in lines:
+                #checkXKom(line.strip())
+    #except IOError as e:
+        #print(f'File name: {file_name}')
+        #if e.errno == errno.ENOENT:
+            #print("File not found!")
+        #else:
+            #print("An error occurred:", e)
